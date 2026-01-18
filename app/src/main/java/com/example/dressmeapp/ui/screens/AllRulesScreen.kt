@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.dressmeapp.model.Clothes
 import com.example.dressmeapp.model.Rule
 import com.example.dressmeapp.viewmodel.ClothesViewModel
@@ -36,7 +37,7 @@ fun AllRulesScreen(padding: PaddingValues,
         // --- Section Règles de couleurs ---
         item {
             Spacer(Modifier.height(14.dp))
-            Text("Règles de couleurs", style = MaterialTheme.typography.titleMedium)
+            Text("Ne pas associer les couleurs", style = MaterialTheme.typography.titleMedium)
         }
 
         items(colorRules) { rule ->
@@ -49,7 +50,7 @@ fun AllRulesScreen(padding: PaddingValues,
         // --- Section Règles de vêtements ---
         item {
             Spacer(Modifier.height(72.dp))
-            Text("Règles de vêtements", style = MaterialTheme.typography.titleMedium)
+            Text("Ne pas associer les vêtements", style = MaterialTheme.typography.titleMedium)
         }
 
         items(clothesRules) { rule ->
@@ -67,33 +68,86 @@ fun AllRulesScreen(padding: PaddingValues,
 private fun RuleRowClothe(rule: Rule, onDelete: (Rule) -> Unit, allClothes: List<Clothes>) {
     val clothe1 = allClothes.find { it.id.toString() == rule.first }
     val clothe2 = allClothes.find { it.id.toString() == rule.second }
-    Card {
+
+    Card(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Row(
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val label1 = when {
-                !clothe1?.nom.isNullOrBlank() ->
-                    "${clothe1?.nom} - ${clothe1?.color}"
-                !clothe1?.subCategory.isNullOrBlank() ->
-                    "${clothe1?.category} - ${clothe1?.subCategory} - ${clothe1?.color}"
-                else ->
-                    "${clothe1?.category} - ${clothe1?.color}"
+            // --- Colonne gauche : vêtement 1, "et", vêtement 2 ---
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                // Vêtement 1
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    clothe1?.imageUri?.let { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(end = 6.dp)
+                        )
+                    }
+                    Text(
+                        text = clothe1?.let {
+                            when {
+                                !it.nom.isNullOrBlank() ->
+                                    "${it.nom} - ${it.color}"
+                                !it.subCategory.isNullOrBlank() ->
+                                    "${it.category} - ${it.subCategory} - ${it.color}"
+                                else ->
+                                    "${it.category} - ${it.color}"
+                            }
+                        }.orEmpty(),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Texte "et"
+                Text(
+                    text = "et",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 42.dp) // alignement avec le texte du dessus
+                )
+
+                // Vêtement 2
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    clothe2?.imageUri?.let { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(end = 6.dp)
+                        )
+                    }
+                    Text(
+                        text = clothe2?.let {
+                            when {
+                                !it.nom.isNullOrBlank() ->
+                                    "${it.nom} - ${it.color}"
+                                !it.subCategory.isNullOrBlank() ->
+                                    "${it.category} - ${it.subCategory} - ${it.color}"
+                                else ->
+                                    "${it.category} - ${it.color}"
+                            }
+                        }.orEmpty(),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
 
-            val label2 = when {
-                !clothe2?.nom.isNullOrBlank() ->
-                    "${clothe2?.nom} - ${clothe2?.color}"
-                !clothe2?.subCategory.isNullOrBlank() ->
-                    "${clothe2?.category} - ${clothe2?.subCategory} - ${clothe2?.color}"
-                else ->
-                    "${clothe2?.category} - ${clothe2?.color}"
-            }
-            Text("$label1 ❌ $label2", style = MaterialTheme.typography.bodyMedium)
-            IconButton(onClick = { onDelete(rule) }) {
+            // --- Icone delete alignée avec "et" ---
+            IconButton(
+                onClick = { onDelete(rule) },
+                modifier = Modifier.align(Alignment.CenterVertically)
+            ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Supprimer",
@@ -103,6 +157,7 @@ private fun RuleRowClothe(rule: Rule, onDelete: (Rule) -> Unit, allClothes: List
         }
     }
 }
+
 @Composable
 private fun RuleRow(rule: Rule, onDelete: (Rule) -> Unit) {
     Card {
@@ -113,7 +168,7 @@ private fun RuleRow(rule: Rule, onDelete: (Rule) -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("${rule.first} ❌ ${rule.second}", style = MaterialTheme.typography.bodyMedium)
+            Text("${rule.first} et ${rule.second}", style = MaterialTheme.typography.bodyMedium)
             IconButton(onClick = { onDelete(rule) }) {
                 Icon(
                     imageVector = Icons.Default.Delete,
