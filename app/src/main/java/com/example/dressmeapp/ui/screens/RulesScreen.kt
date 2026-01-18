@@ -2,38 +2,24 @@ package com.example.dressmeapp.ui.screens
 
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.dressmeapp.ui.components.PageTitle
-
-
-
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.dressmeapp.model.Clothes
-import com.example.dressmeapp.model.Rule
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 import com.example.dressmeapp.viewmodel.RulesViewModel
 
 @Composable
 fun RulesScreen(padding: PaddingValues,
     viewModel: RulesViewModel, clothesViewModel: ClothesViewModel
-  //  allClothes: List<Clothes>, // Liste des vêtements pour les menus
-    //colorsList: List<String> = listOf("Noir", "Blanc", "Bleu", "Rouge", "Vert", "Jaune", "Gris", "Rose", "Beige")
 ) {
     val allClothes by clothesViewModel.allClothes.observeAsState(emptyList())
     val colorsList: List<String> = listOf("Vert", "Bleu", "Rouge", "Noir", "Orange", "Bordeaux", "Marron", "Blanc", "Beige", "Écru", "Multicolore")
-    val colorRules by viewModel.colorRules.observeAsState(emptyList())
-    val clothesRules by viewModel.clothesRules.observeAsState(emptyList())
 
     LazyColumn( modifier = Modifier
         .padding(padding)
@@ -107,15 +93,20 @@ private fun AddClothesRuleForm(
     clothes: List<Clothes>,
     onAdd: (Int, Int) -> Unit
 ) {
-    // Labels lisibles pour l’utilisateur
     val clothesOptions = remember(clothes) {
         clothes.map { cloth ->
-            val label = when {
-                !cloth.nom.isNullOrBlank() -> "${cloth.nom} - ${cloth.color}"
-                !cloth.subCategory.isNullOrBlank() -> "${cloth.category} - ${cloth.subCategory} - ${cloth.color}"
-                else -> "${cloth.category} - ${cloth.color}"
-            }
-            label to cloth.id
+            ClothesOption(
+                id = cloth.id,
+                imageUrl = cloth.imageUri,
+                label = when {
+                    !cloth.nom.isNullOrBlank() ->
+                        "${cloth.nom} - ${cloth.color}"
+                    !cloth.subCategory.isNullOrBlank() ->
+                        "${cloth.category} - ${cloth.subCategory} - ${cloth.color}"
+                    else ->
+                        "${cloth.category} - ${cloth.color}"
+                }
+            )
         }
     }
 
@@ -130,29 +121,27 @@ private fun AddClothesRuleForm(
 
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        DropdownMenuBox(
+        ClothesDropdownMenuBox(
             label = "Vêtement 1",
-            options = clothesOptions.map { it.first },
-            selected = selected1?.first.orEmpty(),
-            onSelect = { label ->
-                selected1 = clothesOptions.find { it.first == label }
+            options = clothesOptions,
+            selected = selected1,
+            onSelect = { selected1 = it
                        },
             modifier = Modifier.fillMaxWidth()
         )
-        DropdownMenuBox(
+        ClothesDropdownMenuBox(
             label = "Vêtement 2",
-            options = clothesOptions.map { it.first },
-            selected = selected2?.first.orEmpty(),
-            onSelect = { label ->
-                selected2 = clothesOptions.find { it.first == label }
+            options = clothesOptions,
+            selected = selected2,
+            onSelect = { selected2 = it
             },
             modifier = Modifier.fillMaxWidth()
         )
 
         Button(
             onClick = {
-                val id1 = selected1?.second
-                val id2 = selected2?.second
+                val id1 = selected1?.id
+                val id2 = selected2?.id
                 if (id1 != null && id2 != null && id1 != id2) {
                     onAdd(id1, id2)
                 }
@@ -161,6 +150,74 @@ private fun AddClothesRuleForm(
             enabled = clothesOptions.size >= 2
         ) {
             Text("Ajouter la règle de vêtements")
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ClothesDropdownMenuBox(
+    label: String,
+    options: List<ClothesOption>,
+    selected: ClothesOption?,
+    onSelect: (ClothesOption) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier
+    ) {
+        OutlinedTextField(
+            modifier = Modifier.menuAnchor()
+                .fillMaxWidth(),
+            readOnly = true,
+            value = selected?.label.orEmpty(),
+            onValueChange = {},
+            label = { Text(label) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            leadingIcon = {
+                selected?.imageUrl?.let { url ->
+                    AsyncImage(
+                        model = url,
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
+            }
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            AsyncImage(
+                                model = option.imageUrl,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(60.dp)
+                                    .padding(end = 8.dp)
+                            )
+                            Text(option.label)
+                        }
+                    },
+                    onClick = {
+                        onSelect(option)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
@@ -207,4 +264,10 @@ private fun DropdownMenuBox(
         }
     }
 }
+
+data class ClothesOption(
+    val id: Int,
+    val label: String,
+    val imageUrl: String?
+)
 
