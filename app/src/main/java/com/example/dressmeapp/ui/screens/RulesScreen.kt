@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.dressmeapp.enums.ColorEnum
 import com.example.dressmeapp.model.Clothes
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 import com.example.dressmeapp.viewmodel.RulesViewModel
@@ -19,7 +20,7 @@ fun RulesScreen(padding: PaddingValues,
     viewModel: RulesViewModel, clothesViewModel: ClothesViewModel
 ) {
     val allClothes by clothesViewModel.allClothes.observeAsState(emptyList())
-    val colorsList: List<String> = listOf("Vert", "Bleu", "Rouge", "Noir", "Orange", "Bordeaux", "Marron", "Blanc", "Beige", "Écru", "Multicolore")
+    val colorsList: List<String> = ColorEnum.entries.map { it.label }
 
     LazyColumn( modifier = Modifier
         .padding(padding)

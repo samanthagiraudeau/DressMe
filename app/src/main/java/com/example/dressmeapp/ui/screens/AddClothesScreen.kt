@@ -93,7 +93,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
             )
         }
         item {
-            val categories = listOf(CategoryEnum.MANTEAU.label, CategoryEnum.HAUT.label, CategoryEnum.BAS.label, CategoryEnum.GLOBAL.label, CategoryEnum.CHAUSSURES.label)
+            val categories = CategoryEnum.entries.map { it.label }
             val subCategoriesHaut = listOf(SubCategoryEnum.PULL.label, SubCategoryEnum.GILET.label, SubCategoryEnum.TEESHIRT.label)
             val subCategoriesBas = listOf(SubCategoryEnum.PANTALON.label, SubCategoryEnum.JUPE.label, SubCategoryEnum.SHORT.label)
 
@@ -126,7 +126,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
         item {
             ExposedDropdownMenuBoxSample(
                 label = "Couleur",
-                options = listOf(ColorEnum.VERT.label, ColorEnum.BORDEAUX.label, ColorEnum.BLEU.label, ColorEnum.NOIR.label, ColorEnum.BEIGE.label, ColorEnum.BLANC.label, ColorEnum.JAUNE.label, ColorEnum.MARRON.label, ColorEnum.ORANGE.label, ColorEnum.ROUGE.label, ColorEnum.MULTICOLOR.label),
+                options = ColorEnum.entries.map { it.label },
                 value = color,
                 onValueChange = { color = it }
             )
@@ -134,9 +134,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
         item {
             ExposedDropdownMenuBoxSample(
                 label = "Motif",
-                options = listOf(MotifEnum.AUCUN.label, MotifEnum.ASYMETRIQUE.label, MotifEnum.COEURS.label,
-                    MotifEnum.FLEURS.label, MotifEnum.POIS.label, MotifEnum.RAYURES.label,
-                    MotifEnum.AUTRE.label),
+                options = MotifEnum.entries.map {it.label},
                 value = motif,
                 onValueChange = { motif = it }
             )
@@ -145,8 +143,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
             // Saison (menu simple)
             ExposedDropdownMenuBoxSample(
                 label = "Saison",
-                options = listOf(SaisonEnum.HIVER.label, SaisonEnum.ETE.label, SaisonEnum.AUTOMNE.label,
-                    SaisonEnum.PRINTEMPS.label, SaisonEnum.TOUTES.label),
+                options = SaisonEnum.entries.map {it.label},
                 value = season,
                 onValueChange = { season = it }
             )
