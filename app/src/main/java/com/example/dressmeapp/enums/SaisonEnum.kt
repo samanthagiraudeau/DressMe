@@ -5,5 +5,4 @@ enum class SaisonEnum(val label: String) {
     ETE("Été"),
     PRINTEMPS("Printemps"),
     AUTOMNE("Automne"),
-    TOUTES("Toutes saisons")
 }

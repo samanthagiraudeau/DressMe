@@ -141,6 +141,9 @@ fun ClothesCard(item: Clothes, onDelete: (Clothes) -> Unit) {
                         }
                     }
                     Text(details.lowercase(), style = MaterialTheme.typography.bodyMedium)
+
+                    var labelSeason = item.season.lowercase().replace("-", " ")
+                    Text(labelSeason, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 

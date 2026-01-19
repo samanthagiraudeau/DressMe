@@ -55,15 +55,13 @@ class ClothesViewModel(application: Application) : AndroidViewModel(application)
     }
 
 
-    suspend fun getRandomOutfit(toggleGlobal: Boolean, toggleGiletWithTeeShirt: Boolean, allRules: List<Rule>): Outfit? = withContext(Dispatchers.IO) {
-        val manteaux = repo.getByType(CategoryEnum.MANTEAU.label.lowercase())
-        val pullsAndGilets = repo.getPullEtGilet()
-        val teeShirts = repo.getTeeShirts()
-        val allBas = repo.getByType(CategoryEnum.BAS.label.lowercase())
-        val shoes = repo.getByType(CategoryEnum.CHAUSSURES.label.lowercase())
-        val global = repo.getByType(CategoryEnum.GLOBAL.label.lowercase())
-
-
+    suspend fun getRandomOutfit(toggleGlobal: Boolean, toggleGiletWithTeeShirt: Boolean, allRules: List<Rule>, season: String): Outfit? = withContext(Dispatchers.IO) {
+        val manteaux = repo.getByTypeAndSeason(CategoryEnum.MANTEAU.label.lowercase(), season)
+        val pullsAndGilets = repo.getPullEtGilet(season)
+        val teeShirts = repo.getTeeShirts(season)
+        val allBas = repo.getByTypeAndSeason(CategoryEnum.BAS.label.lowercase(), season)
+        val shoes = repo.getByTypeAndSeason(CategoryEnum.CHAUSSURES.label.lowercase(), season)
+        val global = repo.getByTypeAndSeason(CategoryEnum.GLOBAL.label.lowercase(), season)
 
         val colorRules = allRules.filter { rule ->  rule.type == RulesEnum.COLORS.label }
         val clotheRules = allRules.filter { rule ->  rule.type == RulesEnum.CLOTHES.label }

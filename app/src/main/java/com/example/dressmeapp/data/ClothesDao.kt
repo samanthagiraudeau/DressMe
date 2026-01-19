@@ -19,11 +19,15 @@ interface ClothesDao {
     @Query("SELECT * FROM clothes WHERE category = :category")
     suspend fun getByType(category: String): List<Clothes>
 
-    @Query("SELECT * FROM clothes WHERE category = 'haut' AND (subCategory = 'pull' OR subCategory = 'gilet')")
-    suspend fun getPullEtGilet(): List<Clothes>
+    @Query("""SELECT * FROM clothes WHERE category = :category AND season LIKE '%' || :season || '%' """)
 
-    @Query("SELECT * FROM clothes WHERE category = 'haut' AND subCategory = 'tee-shirt'")
-    suspend fun getTeeShirts(): List<Clothes>
+    suspend fun getByTypeAndSeason(category: String, season: String): List<Clothes>
+
+    @Query("""SELECT * FROM clothes WHERE category = 'haut' AND (subCategory = 'pull' OR subCategory = 'gilet') AND season LIKE '%' || :season || '%' """)
+    suspend fun getPullEtGilet(season: String): List<Clothes>
+
+    @Query("""SELECT * FROM clothes WHERE category = 'haut' AND subCategory = 'tee-shirt' AND season LIKE '%' || :season || '%' """)
+    suspend fun getTeeShirts(season: String): List<Clothes>
     @Delete
     suspend fun delete(clothes: Clothes)
 

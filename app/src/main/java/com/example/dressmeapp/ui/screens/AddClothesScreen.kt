@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,7 +39,8 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
     var subCategory by remember { mutableStateOf<String?>(null) }
     var color by remember { mutableStateOf("") }
     var motif by remember { mutableStateOf("Aucun") }
-    var season by remember { mutableStateOf("Toutes") }
+    var selectedSeasons by remember { mutableStateOf(listOf<String>()) }
+    var season = ""
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -141,11 +144,11 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
         }
         item {
             // Saison (menu simple)
-            ExposedDropdownMenuBoxSample(
+            MultiSelectDropdownMenu(
                 label = "Saison",
                 options = SaisonEnum.entries.map {it.label},
-                value = season,
-                onValueChange = { season = it }
+                selectedItems = selectedSeasons,
+                onSelectionChange = { selectedSeasons = it }
             )
         }
         item {
@@ -160,7 +163,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
                             category = category,
                             subCategory = subCategory,
                             color = color.trim(),
-                            season = season,
+                            season = selectedSeasons.joinToString (separator = "-" ),
                             imageUri = localPath,
                             motif = motif,
                             nom = nom
@@ -168,9 +171,16 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
 
                         // 3) Reset
                         selectedImage = null
+                        color = ""
+                        nom = ""
+                        category = ""
+                        selectedSeasons = listOf()
+                        subCategory = ""
+                        motif = ""
+
                     }
                 },
-                enabled = selectedImage != null && color.isNotBlank(),
+                enabled = selectedImage != null && color.isNotBlank() && category.isNotBlank(),
                 modifier = Modifier.fillMaxWidth()
 
             ) {
@@ -214,3 +224,55 @@ private fun ExposedDropdownMenuBoxSample(
         }
     }
 }
+
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MultiSelectDropdownMenu(
+    label: String,
+    options: List<String>,
+    selectedItems: List<String>,
+    onSelectionChange: (List<String>) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+
+        OutlinedTextField(
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            readOnly = true,
+            value = if (selectedItems.isEmpty()) "" else selectedItems.joinToString(", "),
+            onValueChange = {},
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    trailingIcon = {
+                        if (selectedItems.contains(option)) {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+                    },
+                    onClick = {
+                        val newList = if (selectedItems.contains(option)) {
+                            selectedItems - option
+                        } else {
+                            selectedItems + option
+                        }
+                        onSelectionChange(newList)
+                    }
+                )
+            }
+        }
+    }
+}
+

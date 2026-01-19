@@ -5,7 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,6 +25,7 @@ import kotlinx.coroutines.launch
 import com.google.accompanist.flowlayout.FlowRow
 import androidx.compose.ui.draw.scale
 import com.example.dressmeapp.enums.CategoryEnum
+import com.example.dressmeapp.enums.SaisonEnum
 import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.viewmodel.RulesViewModel
 
@@ -32,9 +38,10 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
     var generatGlobalOutfit by remember {mutableStateOf(false)}
     var generatGiletWithTeeShirt by remember {mutableStateOf(true)}
     val allRules by rulesViewModel.allRules.observeAsState(emptyList());
+    var selectedSeason by remember { mutableStateOf(SaisonEnum.HIVER.label) } // TODO change en fonction de la date du jour
 
     LaunchedEffect(Unit) {
-        outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules)
+        outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules, selectedSeason)
     }
 
     Column (
@@ -76,10 +83,22 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
             }
         }
 
+
+// Saison – sur toute la largeur
+        ExposedDropdownMenuBoxSample(
+            label = "Saison",
+            options = SaisonEnum.entries.map { it.label },
+            value = selectedSeason,
+            onValueChange = { selectedSeason = it },
+        )
+
+        Spacer(Modifier.height(2.dp))
+
+
         // Toggle
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text("Robe ou combi")
             androidx.compose.material3.Switch(
@@ -98,7 +117,7 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
             )
         }
 
-        Button(onClick = { scope.launch { outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules) } }) {
+        Button(onClick = { scope.launch { outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules, selectedSeason) } }) {
             Text("Générer une autre tenue")
         }
 
@@ -127,5 +146,40 @@ private fun OutfitSlot(title: String, uri: String?) {
         }
         Spacer(Modifier.height(4.dp))
         Text(title, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExposedDropdownMenuBoxSample(
+    label: String,
+    options: List<String>,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+        OutlinedTextField(
+            modifier = Modifier
+                .menuAnchor()
+                .scale(0.7f),
+            readOnly = true,
+            value = value,
+            onValueChange = {},
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onValueChange(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
