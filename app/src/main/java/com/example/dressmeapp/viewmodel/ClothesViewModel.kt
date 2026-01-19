@@ -67,6 +67,7 @@ class ClothesViewModel(application: Application) : AndroidViewModel(application)
 
         val colorRules = allRules.filter { rule ->  rule.type == RulesEnum.COLORS.label }
         val clotheRules = allRules.filter { rule ->  rule.type == RulesEnum.CLOTHES.label }
+
         var isOutfitValid = false
         var outfit : Outfit? = null
 
@@ -105,7 +106,8 @@ class ClothesViewModel(application: Application) : AndroidViewModel(application)
             outfit.bas?.id.toString(),
             outfit.haut?.id.toString(),
             outfit.chaussures?.id.toString(),
-            outfit.manteau?.id.toString()
+            outfit.manteau?.id.toString(),
+            outfit.teeShirt?.id.toString()
         )
 
         clotheRules.forEach { rule ->

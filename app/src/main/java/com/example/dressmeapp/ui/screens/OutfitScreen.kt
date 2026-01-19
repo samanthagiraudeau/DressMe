@@ -98,19 +98,6 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
             )
         }
 
-        // Toggle
-      /*  Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Text("Porter un tee-shirt avec les gilets ?")
-            androidx.compose.material3.Switch(
-                checked = generatGiletWithTeeShirt,
-                onCheckedChange = { generatGiletWithTeeShirt = it },
-                modifier = Modifier.scale(0.7f)
-            )
-        }*/
-
         Button(onClick = { scope.launch { outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules) } }) {
             Text("Générer une autre tenue")
         }
@@ -118,80 +105,6 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
         Spacer(modifier = Modifier.padding(0.dp, 0.dp, 0.dp, 2.dp))
 
     }
-    /*
-    LazyColumn(
-        modifier = Modifier
-            .padding(padding)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            PageTitle("Tenue aléatoire")
-        }
-
-        item {
-            FlowRow(
-                mainAxisSpacing = 16.dp,   // Espacement horizontal entre les slots
-                crossAxisSpacing = 16.dp,
-            ) {
-                OutfitSlot(title = CategoryEnum.MANTEAU.label, uri = outfit?.manteau?.imageUri)
-
-                if(generatGlobalOutfit) {
-                    OutfitSlot(title = CategoryEnum.GLOBAL.label, uri = outfit?.global?.imageUri)
-                } else {
-                    OutfitSlot(title = CategoryEnum.HAUT.label, uri = outfit?.haut?.imageUri)
-                    OutfitSlot(title = CategoryEnum.BAS.label, uri = outfit?.bas?.imageUri)
-                    if(generatGiletWithTeeShirt && outfit?.teeShirt != null) {
-                        OutfitSlot(title = SubCategoryEnum.TEESHIRT.label, uri = outfit?.teeShirt?.imageUri)
-                    }
-                }
-
-                OutfitSlot(title = CategoryEnum.CHAUSSURES.label, uri = outfit?.chaussures?.imageUri)
-            }
-        }
-        item {
-            // Toggle
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("Tenue avec robe ou combi ?")
-                androidx.compose.material3.Switch(
-                    checked = generatGlobalOutfit,
-                    onCheckedChange = { generatGlobalOutfit = it } ,
-                    modifier = Modifier.scale(0.7f)
-                )
-            }
-        }
-        item {
-            // Toggle
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("Porter un tee-shirt avec les gilets ?")
-                androidx.compose.material3.Switch(
-                    checked = generatGiletWithTeeShirt,
-                    onCheckedChange = { generatGiletWithTeeShirt = it },
-                    modifier = Modifier.scale(0.7f)
-                )
-            }
-        }
-        item {
-            Button(onClick = { scope.launch { outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules) } }) {
-                Text("Générer une autre tenue")
-            }
-
-            /* if (outfit?.manteau == null || outfit?.haut == null || outfit?.bas == null || outfit?.chaussures == null) {
-                Text("Ajoute plus de vêtements !")
-            } */
-        }
-
-
-    }
-
-     */
 }
 
 @Composable
