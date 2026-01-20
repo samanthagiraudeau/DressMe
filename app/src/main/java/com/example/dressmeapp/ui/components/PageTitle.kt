@@ -31,7 +31,7 @@ fun PageTitle(
             .padding(top = 8.dp, bottom = 8.dp)
     } else {
         modifier
-            .padding(vertical = 4.dp)
+            .padding(top = 8.dp, bottom = 8.dp)
             .heightIn(min = 24.dp, max = 64.dp)
     }
 
