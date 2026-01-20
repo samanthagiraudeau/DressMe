@@ -2,6 +2,8 @@
 package com.example.dressmeapp.viewmodel
 
 import android.app.Application
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +15,10 @@ import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.model.Clothes
 import com.example.dressmeapp.model.Rule
 import com.example.dressmeapp.ui.screens.OutfitScreen
+import com.example.dressmeapp.utils.copyImageToInternalStorage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -22,7 +27,8 @@ data class Outfit(val manteau: Clothes?, val haut: Clothes?, val bas: Clothes?, 
 
 class ClothesViewModel(application: Application) : AndroidViewModel(application) {
     private val repo: ClothesRepository
-
+    private val _outfit = MutableStateFlow<Outfit?>(null)
+    val outfit = _outfit.asStateFlow()
     val allClothes by lazy { repo.allClothes }
 
     init {
@@ -147,6 +153,52 @@ class ClothesViewModel(application: Application) : AndroidViewModel(application)
             bas = bas,
             chaussures = shoe
         )
+    }
 
+    fun saveClothes(
+        context: Context,
+        sourceUri: Uri,
+        category: String,
+        subCategory: String?,
+        color: String,
+        seasons: List<String>,
+        motif: String,
+        nom: String,
+        onDone: () -> Unit
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val localPath = copyImageToInternalStorage(context, sourceUri)
+
+            addClothes(
+                category = category,
+                subCategory = subCategory,
+                color = color.trim(),
+                season = seasons.joinToString("-"),
+                imageUri = localPath,
+                motif = motif,
+                nom = nom
+            )
+
+            withContext(Dispatchers.Main) {
+                onDone()
+            }
+        }
+    }
+    fun generateOutfit(
+        generatGlobalOutfit: Boolean,
+        generatGiletWithTeeShirt: Boolean,
+        rules: List<Rule>,
+        season: String
+    ) {
+        viewModelScope.launch(Dispatchers.Default) {
+            val result = getRandomOutfit(
+                generatGlobalOutfit,
+                generatGiletWithTeeShirt,
+                rules,
+                season
+            )
+            _outfit.value = result
+        }
     }
 }
