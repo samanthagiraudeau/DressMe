@@ -1,6 +1,7 @@
 
 package com.example.dressmeapp
 
+import AddClothesScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import com.example.dressmeapp.ui.screens.AddClothesScreen
 import com.example.dressmeapp.ui.screens.AllClothesScreen
 import com.example.dressmeapp.ui.screens.OutfitScreen
 import com.example.dressmeapp.ui.theme.DressMeTheme

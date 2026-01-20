@@ -1,50 +1,60 @@
-
-package com.example.dressmeapp.ui.screens
-
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.dressmeapp.enums.CategoryEnum
 import com.example.dressmeapp.enums.ColorEnum
+import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.enums.MotifEnum
 import com.example.dressmeapp.enums.SaisonEnum
-import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.ui.components.PageTitle
-import com.example.dressmeapp.utils.copyImageToInternalStorage
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
+fun AddClothesScreen(
+    padding: PaddingValues,
+    viewModel: ClothesViewModel
+) {
     val context = LocalContext.current
 
-    var selectedImage by remember { mutableStateOf<Uri?>(null) }
-    var category by remember { mutableStateOf("") }
-    var nom by remember { mutableStateOf("") }
-    var subCategory by remember { mutableStateOf<String?>(null) }
-    var color by remember { mutableStateOf("") }
-    var motif by remember { mutableStateOf("Aucun") }
-    var selectedSeasons by remember { mutableStateOf(listOf<String>()) }
-    var season = ""
+    var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var category by rememberSaveable { mutableStateOf("") }
+    var nom by rememberSaveable { mutableStateOf("") }
+    var subCategory by rememberSaveable { mutableStateOf<String?>(null) }
+    var color by rememberSaveable { mutableStateOf("") }
+    var motif by rememberSaveable { mutableStateOf("Aucun") }
+    var selectedSeasons by rememberSaveable { mutableStateOf(listOf<String>()) }
+
+
+    val subCategoriesHaut = listOf(
+        SubCategoryEnum.PULL.label,
+        SubCategoryEnum.GILET.label,
+        SubCategoryEnum.TEESHIRT.label
+    )
+
+    val subCategoriesBas = listOf(
+        SubCategoryEnum.PANTALON.label,
+        SubCategoryEnum.JUPE.label,
+        SubCategoryEnum.SHORT.label
+    )
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+        ActivityResultContracts.GetContent()
+    ) { uri ->
         selectedImage = uri
     }
 
@@ -56,11 +66,10 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
+        item { PageTitle("Ajouter un vêtement") }
+
         item {
-            PageTitle("Ajouter un vêtement")
-        }
-        item {
-            // Aperçu image
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,6 +88,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
                 }
             }
         }
+
         item {
             Button(
                 onClick = { launcher.launch("image/*") },
@@ -87,6 +97,7 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
                 Text("Choisir une photo")
             }
         }
+
         item {
             TextField(
                 value = nom,
@@ -95,37 +106,31 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        item {
-            val categories = CategoryEnum.entries.map { it.label }
-            val subCategoriesHaut = listOf(SubCategoryEnum.PULL.label, SubCategoryEnum.GILET.label, SubCategoryEnum.TEESHIRT.label)
-            val subCategoriesBas = listOf(SubCategoryEnum.PANTALON.label, SubCategoryEnum.JUPE.label, SubCategoryEnum.SHORT.label)
 
-            // Category (menu simple)
+        item {
             ExposedDropdownMenuBoxSample(
                 label = "Catégorie",
-                options = categories,
+                options = CategoryEnum.entries.map { it.label },
                 value = category,
                 onValueChange = {
                     category = it
                     subCategory = null
                 }
             )
+        }
 
-            if (category == "Haut") {
+        if (category == CategoryEnum.HAUT.label || category == CategoryEnum.BAS.label) {
+            val subCategories = if (category == CategoryEnum.HAUT.label) subCategoriesHaut else subCategoriesBas
+            item {
                 ExposedDropdownMenuBoxSample(
                     label = "Sous-catégorie",
-                    options = subCategoriesHaut,
+                    options = subCategories,
                     value = subCategory ?: "",
                     onValueChange = { subCategory = it }
                 )
-            } else if (category == "Bas") {
-                ExposedDropdownMenuBoxSample(
-                    label = "Sous-catégorie",
-                    options = subCategoriesBas,
-                    value = subCategory ?: "",
-                    onValueChange = { subCategory = it }
-                )
-            }}
+            }
+        }
+
         item {
             ExposedDropdownMenuBoxSample(
                 label = "Couleur",
@@ -134,62 +139,58 @@ fun AddClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
                 onValueChange = { color = it }
             )
         }
+
         item {
             ExposedDropdownMenuBoxSample(
                 label = "Motif",
-                options = MotifEnum.entries.map {it.label},
+                options = MotifEnum.entries.map { it.label },
                 value = motif,
                 onValueChange = { motif = it }
             )
         }
+
         item {
-            // Saison (menu simple)
             MultiSelectDropdownMenu(
                 label = "Saison",
-                options = SaisonEnum.entries.map {it.label},
+                options = SaisonEnum.entries.map { it.label },
                 selectedItems = selectedSeasons,
                 onSelectionChange = { selectedSeasons = it }
             )
         }
+
         item {
             Button(
+                enabled = selectedImage != null && category.isNotBlank() && color.isNotBlank(),
+                modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    selectedImage?.let { sourceUri ->
-                        // 1) Copie dans le stockage interne (JPEG 90%)
-                        val localPath = copyImageToInternalStorage(context, sourceUri)
+                    val image = selectedImage ?: return@Button
 
-                        // 2) Sauvegarde le chemin absolu en base
-                        viewModel.addClothes(
-                            category = category,
-                            subCategory = subCategory,
-                            color = color.trim(),
-                            season = selectedSeasons.joinToString (separator = "-" ),
-                            imageUri = localPath,
-                            motif = motif,
-                            nom = nom
-                        )
-
-                        // 3) Reset
+                    viewModel.saveClothes(
+                        context = context,
+                        sourceUri = image,
+                        category = category,
+                        subCategory = subCategory,
+                        color = color,
+                        seasons = selectedSeasons,
+                        motif = motif,
+                        nom = nom
+                    ) {
+                        // reset UI
                         selectedImage = null
-                        color = ""
-                        nom = ""
                         category = ""
-                        selectedSeasons = listOf()
-                        subCategory = ""
-                        motif = ""
-
+                        nom = ""
+                        color = ""
+                        motif = "Aucun"
+                        subCategory = null
+                        selectedSeasons = emptyList()
                     }
-                },
-                enabled = selectedImage != null && color.isNotBlank() && category.isNotBlank(),
-                modifier = Modifier.fillMaxWidth()
-
+                }
             ) {
                 Text("Enregistrer")
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
