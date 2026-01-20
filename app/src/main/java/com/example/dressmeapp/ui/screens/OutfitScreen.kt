@@ -28,6 +28,7 @@ import com.example.dressmeapp.enums.CategoryEnum
 import com.example.dressmeapp.enums.SaisonEnum
 import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.viewmodel.RulesViewModel
+import java.time.LocalDate
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -38,7 +39,7 @@ fun OutfitScreen(padding: PaddingValues, viewModel: ClothesViewModel, rulesViewM
     var generatGlobalOutfit by remember {mutableStateOf(false)}
     var generatGiletWithTeeShirt by remember {mutableStateOf(true)}
     val allRules by rulesViewModel.allRules.observeAsState(emptyList());
-    var selectedSeason by remember { mutableStateOf(SaisonEnum.HIVER.label) } // TODO change en fonction de la date du jour
+    var selectedSeason by remember { mutableStateOf(currentSeasonLabel()) }
 
     LaunchedEffect(Unit) {
         outfit = viewModel.getRandomOutfit(generatGlobalOutfit, generatGiletWithTeeShirt, allRules, selectedSeason)
@@ -183,3 +184,16 @@ private fun ExposedDropdownMenuBoxSample(
         }
     }
 }
+
+
+fun currentSeasonLabel(): String {
+    val month = LocalDate.now().monthValue
+    return when (month) {
+        12, 1, 2 -> SaisonEnum.HIVER.label
+        3, 4, 5  -> SaisonEnum.PRINTEMPS.label
+        6, 7, 8  -> SaisonEnum.ETE.label
+        9, 10, 11-> SaisonEnum.AUTOMNE.label
+        else -> SaisonEnum.HIVER.label // fallback très improbable
+    }
+}
+
