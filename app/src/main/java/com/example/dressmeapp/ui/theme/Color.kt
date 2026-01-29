@@ -57,6 +57,47 @@ val DressMe_Warning = DressMe_Framboise
 
 val DressMe_Outline = DressMe_GrisChaud
 
+// ========== LIGHT MODE COLORS ==========
+// Couleurs pour le mode clair (inversées et adaptées)
+internal val DressMe_Light_Bordeaux = Color(0xFF8B3F4B)        // Bordeaux plus clair
+internal val DressMe_Light_VertSapin = Color(0xFF3F5D4B)       // Vert sapin plus clair
+internal val DressMe_Light_MarronChaud = Color(0xFF7A5A4E)     // Marron plus clair
+
+internal val DressMe_Light_LieDeVin = Color(0xFF9B4D5A)        // Lie-de-vin plus clair
+internal val DressMe_Light_Prune = Color(0xFF7B5A7D)           // Prune plus clair
+internal val DressMe_Light_BleuElectrique = Color(0xFF4E7FC7)  // Bleu plus clair
+
+internal val DressMe_Light_Framboise = Color(0xFFE07A98)       // Framboise plus saturé
+internal val DressMe_Light_Corail = Color(0xFFF68A6A)          // Corail plus saturé
+internal val DressMe_Light_VertLumineux = Color(0xFF5FAF7A)    // Vert plus saturé
+
+// Neutres pour light mode (inversés)
+internal val DressMe_Light_Background = Color(0xFFFFFBF7)      // Blanc cassé chaud
+internal val DressMe_Light_Surface = Color(0xFFF8F0E8)         // Surface très claire
+internal val DressMe_Light_SurfaceVariant = Color(0xFFEFE5DD)  // Variant clair
+internal val DressMe_Light_OnBackground = Color(0xFF2F2623)    // Texte foncé
+internal val DressMe_Light_OnSurface = Color(0xFF2F2623)       // Texte foncé
+internal val DressMe_Light_Outline = Color(0xFF8E7E78)         // Bordure moyenne
+
+// ========== DARK MODE COLORS (actuelles) ==========
+// Garder les couleurs existantes pour le dark mode
+internal val DressMe_Dark_Bordeaux = DressMe_Bordeaux
+internal val DressMe_Dark_VertSapin = DressMe_VertSapin
+internal val DressMe_Dark_MarronChaud = DressMe_MarronChaud
+
+internal val DressMe_Dark_LieDeVin = DressMe_LieDeVin
+internal val DressMe_Dark_Prune = DressMe_Prune
+internal val DressMe_Dark_Framboise = DressMe_Framboise
+internal val DressMe_Dark_Corail = DressMe_Corail
+internal val DressMe_Dark_VertLumineux = DressMe_VertLumineux
+
+internal val DressMe_Dark_Background = Color(0xFF1A1615)       // Presque noir
+internal val DressMe_Dark_Surface = Color(0xFF2A2623)          // Surface sombre
+internal val DressMe_Dark_SurfaceVariant = Color(0xFF3A3633)   // Variant sombre
+internal val DressMe_Dark_OnBackground = DressMe_Ecru          // Texte clair
+internal val DressMe_Dark_OnSurface = DressMe_Ecru             // Texte clair
+internal val DressMe_Dark_Outline = DressMe_GrisChaud          // Bordure
+
 @Suppress("unused")
 internal val DressMe_Palette = listOf(
     DressMe_Bordeaux,

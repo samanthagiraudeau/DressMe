@@ -167,7 +167,7 @@ fun OutfitScreen(
 
     // Modales
     if (showSettings) {
-        ModalBottomSheet(onDismissRequest = { showSettings = false }) {
+        ModalBottomSheet(onDismissRequest = { showSettings = false }, containerColor = MaterialTheme.colorScheme.surface) {
             SettingsContent(
                 selectedSeason = selectedSeason,
                 onSeasonChange = { selectedSeason = it },
@@ -273,7 +273,7 @@ fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.surfaceVariant,
                         androidx.compose.foundation.shape.RoundedCornerShape(Dimensions.cornerMedium)
                     )
                     .clickable { expandedSeason = true }
@@ -339,19 +339,19 @@ fun SaveOutfitSheet(
     val allSeasons = SaisonEnum.entries.map { it.label }
     val selectedSeasons = remember { mutableStateListOf<String>() }
 
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = MaterialTheme.colorScheme.surface) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimensions.spacing24),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.spacing16)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.spacing16),
         ) {
             Text("Enregistrer la tenue", style = MaterialTheme.typography.headlineSmall)
 
             DressMeTextField(
                 value = label,
                 onValueChange = { label = it },
-                label = "Nom de la tenue"
+                label = "Nom de la tenue",
             )
 
             Text("Saisons", style = MaterialTheme.typography.titleSmall)

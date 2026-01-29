@@ -253,7 +253,7 @@ private fun ClothesDropdownSection(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 options.forEach { option ->
                     DropdownMenuItem(

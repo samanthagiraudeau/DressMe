@@ -136,7 +136,7 @@ fun ClothesCard(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = "Supprimer",
                                     tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(Dimensions.iconSizeSmall)
+                                    modifier = Modifier.size(Dimensions.iconSizeMedium),
                                 )
                             }
                         }

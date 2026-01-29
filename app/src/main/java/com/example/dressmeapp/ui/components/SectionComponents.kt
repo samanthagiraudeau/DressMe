@@ -68,7 +68,7 @@ fun ExpandableSection(
             Icon(
                 imageVector = if (isExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                 contentDescription = if (isExpanded) "Replier" else "Déplier",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(Dimensions.iconSizeMedium)
             )
         }
