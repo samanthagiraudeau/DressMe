@@ -47,7 +47,7 @@ fun PageTitle(
         )
         if (showDivider) {
             Spacer(Modifier.height(8.dp))
-            Divider()
+            HorizontalDivider()
         }
     }
 }

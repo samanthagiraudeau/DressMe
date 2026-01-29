@@ -2,6 +2,9 @@ package com.example.dressmeapp.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -15,43 +18,60 @@ import com.example.dressmeapp.ui.components.PageTitle
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 import com.example.dressmeapp.viewmodel.RulesViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RulesScreen(
     padding: PaddingValues,
     viewModel: RulesViewModel,
-    clothesViewModel: ClothesViewModel
+    clothesViewModel: ClothesViewModel,
+    onBack: () -> Unit
 ) {
     val allClothes by clothesViewModel.allClothes.observeAsState(emptyList())
     val colorsList = ColorEnum.entries.map { it.label }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .imePadding(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item { PageTitle("Gestion des règles") }
+    Column(modifier = Modifier.fillMaxSize()) {
 
-        // Section : Règles de couleurs
-        item {
-            Text("Règles de couleurs", style = MaterialTheme.typography.titleMedium)
-        }
-        item {
-            AddColorRuleForm(colors = colorsList, onAdd = { c1, c2 -> viewModel.addColorRule(c1, c2) })
-        }
+        TopAppBar(
+            title = { Text("Ajouter une règle") },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                }
+            }
+        )
 
-        // Section : Règles de vêtements
-        item {
-            Spacer(Modifier.height(12.dp))
-            Text("Règles de vêtements", style = MaterialTheme.typography.titleMedium)
-        }
-        item {
-            AddClothesRuleForm(
-                clothes = allClothes,
-                onAdd = { v1, v2 -> viewModel.addClothesRule(v1.toString(), v2.toString()) }
-            )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .imePadding(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Section : Règles de couleurs
+            item {
+                Text("Règles de couleurs", style = MaterialTheme.typography.titleMedium)
+            }
+            item {
+                AddColorRuleForm(
+                    colors = colorsList,
+                    onAdd = { c1, c2 -> viewModel.addColorRule(c1, c2) },
+                    onBack = { onBack() }
+                )
+            }
+
+            // Section : Règles de vêtements
+            item {
+                Spacer(Modifier.height(12.dp))
+                Text("Règles de vêtements", style = MaterialTheme.typography.titleMedium)
+            }
+            item {
+                AddClothesRuleForm(
+                    clothes = allClothes,
+                    onAdd = { v1, v2 -> viewModel.addClothesRule(v1.toString(), v2.toString()) },
+                    onBack = { onBack() }
+                )
+            }
         }
     }
 }
@@ -59,7 +79,8 @@ fun RulesScreen(
 @Composable
 private fun AddColorRuleForm(
     colors: List<String>,
-    onAdd: (String, String) -> Unit
+    onAdd: (String, String) -> Unit,
+    onBack: () -> Unit
 ) {
     var color1 by remember { mutableStateOf(colors.firstOrNull().orEmpty()) }
     var color2 by remember { mutableStateOf(colors.getOrElse(1) { colors.firstOrNull().orEmpty() }) }
@@ -69,7 +90,10 @@ private fun AddColorRuleForm(
         DropdownMenuBox(label = "Couleur 2", options = colors, selected = color2, onSelect = { color2 = it })
 
         Button(
-            onClick = { if (color1.isNotBlank() && color2.isNotBlank() && color1 != color2) onAdd(color1, color2) },
+            onClick = {
+                if (color1.isNotBlank() && color2.isNotBlank() && color1 != color2) onAdd(color1, color2)
+                onBack()
+                      },
             modifier = Modifier.fillMaxWidth()
         ) { Text("Ajouter la règle de couleurs") }
     }
@@ -78,7 +102,8 @@ private fun AddColorRuleForm(
 @Composable
 private fun AddClothesRuleForm(
     clothes: List<Clothes>,
-    onAdd: (Int, Int) -> Unit
+    onAdd: (Int, Int) -> Unit,
+    onBack: () -> Unit
 ) {
     val clothesOptions = remember(clothes) {
         clothes.map { cloth ->
@@ -106,6 +131,7 @@ private fun AddClothesRuleForm(
                 val id1 = selected1?.id
                 val id2 = selected2?.id
                 if (id1 != null && id2 != null && id1 != id2) onAdd(id1, id2)
+                onBack()
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = clothesOptions.size >= 2

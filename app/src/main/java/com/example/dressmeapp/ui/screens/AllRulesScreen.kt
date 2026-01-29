@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,56 +23,80 @@ import com.example.dressmeapp.viewmodel.RulesViewModel
 fun AllRulesScreen(
     padding: PaddingValues,
     viewModel: RulesViewModel,
-    clothesViewModel: ClothesViewModel
+    clothesViewModel: ClothesViewModel,
+    onAddRuleClick: () -> Unit
 ) {
     val colorRules by viewModel.colorRules.observeAsState(emptyList())
     val clothesRules by viewModel.clothesRules.observeAsState(emptyList())
     val allClothes by clothesViewModel.allClothes.observeAsState(emptyList())
 
-    LazyColumn(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .imePadding(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titre principal
-        item { PageTitle("Toutes les règles") }
 
-        // Section : Règles de couleurs
-        item { Spacer(Modifier.height(8.dp)) }
-        item {
-            Text(
-                "Ne pas associer les couleurs",
-                style = MaterialTheme.typography.titleMedium
-            )
-        }
-        items(colorRules) { rule ->
-            RuleRow(
-                rule = rule,
-                onDelete = { viewModel.deleteRule(rule) }
-            )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Titre principal
+            item { PageTitle("Toutes les règles") }
+
+            // Section : Règles de couleurs
+            if(colorRules.isNotEmpty()) {
+                item { Spacer(Modifier.height(8.dp)) }
+                item {
+                    Text(
+                        "Associer les couleurs",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                items(colorRules) { rule ->
+                    RuleRow(
+                        rule = rule,
+                        onDelete = { viewModel.deleteRule(rule) }
+                    )
+                }
+            }
+
+
+            // Section : Règles de vêtements
+            if(clothesRules.isNotEmpty()) {
+                item { Spacer(Modifier.height(16.dp)) }
+
+                item {
+                    Text(
+                        "Associer les vêtements",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                items(clothesRules) { rule ->
+                    RuleRowClothe(
+                        rule = rule,
+                        allClothes = allClothes,
+                        onDelete = { viewModel.deleteRule(rule) }
+                    )
+                }
+
+            }
+
+            item { Spacer(Modifier.height(8.dp)) }
         }
 
-        // Section : Règles de vêtements
-        item { Spacer(Modifier.height(16.dp)) }
-        item {
-            Text(
-                "Ne pas associer les vêtements",
-                style = MaterialTheme.typography.titleMedium
-            )
+        FloatingActionButton(
+            onClick = onAddRuleClick,
+            modifier = Modifier.align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Ajouter une règle")
         }
-        items(clothesRules) { rule ->
-            RuleRowClothe(
-                rule = rule,
-                allClothes = allClothes,
-                onDelete = { viewModel.deleteRule(rule) }
-            )
-        }
-
-        item { Spacer(Modifier.height(8.dp)) }
     }
+
 }
 
 @Composable

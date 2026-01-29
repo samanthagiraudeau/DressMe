@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +31,7 @@ import com.example.dressmeapp.viewmodel.ClothesViewModel
 import java.io.File
 
 @Composable
-fun AllClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
+fun AllClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel, onAddClotheClick: () -> Unit) {
     val clothes by viewModel.allClothes.observeAsState(emptyList())
 
     // Grouper par sous-catégorie si présente, sinon par catégorie
@@ -47,52 +49,68 @@ fun AllClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel) {
         }
     }
 
-    LazyColumn(
+    Box(
         modifier = Modifier
+            .fillMaxSize()
             .padding(padding)
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp), // moins d’espace vertical
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titre
-        item { PageTitle("Mon dressing") }
+        LazyColumn(
+            modifier = Modifier
+                .imePadding()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp), // moins d’espace vertical
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Titre
+            item { PageTitle("Mon dressing") }
 
-        // Parcours des groupes
-        grouped.forEach { (groupName, itemsInGroup) ->
-            val expanded = expandedGroups[groupName] ?: true
+            // Parcours des groupes
+            grouped.forEach { (groupName, itemsInGroup) ->
+                val expanded = expandedGroups[groupName] ?: true
 
-            // Header du groupe
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expandedGroups[groupName] = !expanded }
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(groupName, style = MaterialTheme.typography.titleMedium)
-                    Icon(
-                        imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = if (expanded) "Replier" else "Déplier"
-                    )
+                // Header du groupe
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedGroups[groupName] = !expanded }
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(groupName, style = MaterialTheme.typography.titleMedium)
+                        Icon(
+                            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                            contentDescription = if (expanded) "Replier" else "Déplier"
+                        )
+                    }
                 }
-            }
 
-            // Items du groupe si ouvert
-            if (expanded) {
-                items(itemsInGroup) { item ->
-                    ClothesCard(item) { toDelete ->
-                        viewModel.deleteClothes(toDelete)
+                // Items du groupe si ouvert
+                if (expanded) {
+                    items(itemsInGroup) { item ->
+                        ClothesCard(item) { toDelete ->
+                            viewModel.deleteClothes(toDelete)
+                        }
                     }
                 }
             }
+
+            // Petit espace en bas
+            item { Spacer(Modifier.height(8.dp)) }
         }
 
-        // Petit espace en bas
-        item { Spacer(Modifier.height(8.dp)) }
+        FloatingActionButton(
+            onClick = onAddClotheClick,
+            modifier = Modifier.align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Ajouter un vêtement")
+        }
     }
+
 }
 
 @Composable

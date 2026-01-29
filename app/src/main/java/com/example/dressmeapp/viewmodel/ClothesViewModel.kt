@@ -87,43 +87,64 @@ class ClothesViewModel(application: Application) : AndroidViewModel(application)
 
     }
 
-    fun isOutfitOk(outfit: Outfit, colorRules: List<Rule>, clotheRules: List<Rule>): Boolean {
+
+    fun isOutfitOk(
+        outfit: Outfit,
+        colorRules: List<Rule>,
+        clotheRules: List<Rule>
+    ): Boolean {
+
         val outfitColors = listOfNotNull(
-            outfit.global?.color,
-            outfit.bas?.color,
-            outfit.haut?.color,
-            outfit.chaussures?.color,
-            outfit.manteau?.color
+            outfit.global?.color?.lowercase(),
+            outfit.bas?.color?.lowercase(),
+            outfit.haut?.color?.lowercase(),
+            outfit.chaussures?.color?.lowercase(),
+            outfit.manteau?.color?.lowercase()
         )
 
-        // Règles des couleurs
-        colorRules.forEach { rule ->
-            val hasColor1 = outfitColors.contains(rule.first)
-            val hasColor2 = outfitColors.contains(rule.second)
+        // ------------------------------------------------------
+        // 1️⃣ RÈGLES DE COULEUR
+        // ------------------------------------------------------
+        var isValidColor = false;
+        if(colorRules.isEmpty()) isValidColor = true
+        for (rule in colorRules) {
 
-            if (hasColor1 && hasColor2) return false
+            val hasFirst = outfitColors.contains(rule.first.lowercase())
+            val hasSecond = outfitColors.contains(rule.second.lowercase())
+
+            if(hasFirst && hasSecond) {
+                isValidColor = true
+                break
+            }
         }
 
-        // Règles des vêtements
-        val outfitId = listOfNotNull(
-            outfit.global?.id.toString(),
-            outfit.bas?.id.toString(),
-            outfit.haut?.id.toString(),
-            outfit.chaussures?.id.toString(),
-            outfit.manteau?.id.toString(),
-            outfit.teeShirt?.id.toString()
+        // ------------------------------------------------------
+        // 2️⃣ RÈGLES DE VÊTEMENTS
+        // ------------------------------------------------------
+        var isValidCloth = false
+        val outfitIds = listOfNotNull(
+            outfit.global?.id?.toString(),
+            outfit.bas?.id?.toString(),
+            outfit.haut?.id?.toString(),
+            outfit.chaussures?.id?.toString(),
+            outfit.manteau?.id?.toString(),
+            outfit.teeShirt?.id?.toString()
         )
+        if(clotheRules.isEmpty()) isValidCloth = true
+        for (rule in clotheRules) {
 
-        clotheRules.forEach { rule ->
-            val hasClothe1 = outfitId.contains(rule.first)
-            val hasClothe2 = outfitId.contains(rule.second)
+            val hasFirst = outfitIds.contains(rule.first)
+            val hasSecond = outfitIds.contains(rule.second)
 
-            if (hasClothe1 && hasClothe2) return false
+            if(hasFirst && hasSecond) {
+                isValidCloth = true
+                break
+            }
         }
 
-        // Pas de règle violée -> outfit ok
-        return true
+        return isValidCloth && isValidColor
     }
+
 
     fun generateRandomOutfit(manteaux: List<Clothes>, global: List<Clothes>, pullsAndGilets: List<Clothes>, teeShirts: List<Clothes>, allBas: List<Clothes>, chaussures: List<Clothes>, toggleGlobal: Boolean, toggleGiletWithTeeShirt: Boolean): Outfit {
         var robe: Clothes? = null

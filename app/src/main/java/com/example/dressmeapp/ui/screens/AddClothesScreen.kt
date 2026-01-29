@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -23,11 +24,12 @@ import com.example.dressmeapp.enums.SaisonEnum
 import com.example.dressmeapp.ui.components.PageTitle
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddClothesScreen(
     padding: PaddingValues,
-    viewModel: ClothesViewModel
+    viewModel: ClothesViewModel,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -57,136 +59,146 @@ fun AddClothesScreen(
     ) { uri ->
         selectedImage = uri
     }
+    Column(modifier = Modifier.fillMaxSize()) {
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(padding)
-            .imePadding()
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        item { PageTitle("Ajouter un vêtement") }
-
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                if (selectedImage != null) {
-                    Image(
-                        painter = rememberAsyncImagePainter(selectedImage),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Text("Aucune image sélectionnée")
+        TopAppBar(
+            title = { Text("Ajouter un vêtement") },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
                 }
             }
-        }
+        )
 
-        item {
-            Button(
-                onClick = { launcher.launch("image/*") },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Choisir une photo")
-            }
-        }
-
-        item {
-            TextField(
-                value = nom,
-                onValueChange = { nom = it },
-                label = { Text("Label") },
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        item {
-            ExposedDropdownMenuBoxSample(
-                label = "Catégorie",
-                options = CategoryEnum.entries.map { it.label },
-                value = category,
-                onValueChange = {
-                    category = it
-                    subCategory = null
-                }
-            )
-        }
-
-        if (category == CategoryEnum.HAUT.label || category == CategoryEnum.BAS.label) {
-            val subCategories = if (category == CategoryEnum.HAUT.label) subCategoriesHaut else subCategoriesBas
+        LazyColumn(
+            modifier = Modifier
+                .padding(padding)
+                .imePadding()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             item {
-                ExposedDropdownMenuBoxSample(
-                    label = "Sous-catégorie",
-                    options = subCategories,
-                    value = subCategory ?: "",
-                    onValueChange = { subCategory = it }
-                )
-            }
-        }
-
-        item {
-            ExposedDropdownMenuBoxSample(
-                label = "Couleur",
-                options = ColorEnum.entries.map { it.label },
-                value = color,
-                onValueChange = { color = it }
-            )
-        }
-
-        item {
-            ExposedDropdownMenuBoxSample(
-                label = "Motif",
-                options = MotifEnum.entries.map { it.label },
-                value = motif,
-                onValueChange = { motif = it }
-            )
-        }
-
-        item {
-            MultiSelectDropdownMenu(
-                label = "Saison",
-                options = SaisonEnum.entries.map { it.label },
-                selectedItems = selectedSeasons,
-                onSelectionChange = { selectedSeasons = it }
-            )
-        }
-
-        item {
-            Button(
-                enabled = selectedImage != null && category.isNotBlank() && color.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    val image = selectedImage ?: return@Button
-
-                    viewModel.saveClothes(
-                        context = context,
-                        sourceUri = image,
-                        category = category,
-                        subCategory = subCategory,
-                        color = color,
-                        seasons = selectedSeasons,
-                        motif = motif,
-                        nom = nom
-                    ) {
-                        // reset UI
-                        selectedImage = null
-                        category = ""
-                        nom = ""
-                        color = ""
-                        motif = "Aucun"
-                        subCategory = null
-                        selectedSeasons = emptyList()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (selectedImage != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(selectedImage),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text("Aucune image sélectionnée")
                     }
                 }
-            ) {
-                Text("Enregistrer")
+            }
+
+            item {
+                Button(
+                    onClick = { launcher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Choisir une photo")
+                }
+            }
+
+            item {
+                TextField(
+                    value = nom,
+                    onValueChange = { nom = it },
+                    label = { Text("Label") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            item {
+                ExposedDropdownMenuBoxSample(
+                    label = "Catégorie",
+                    options = CategoryEnum.entries.map { it.label },
+                    value = category,
+                    onValueChange = {
+                        category = it
+                        subCategory = null
+                    }
+                )
+            }
+
+            if (category == CategoryEnum.HAUT.label || category == CategoryEnum.BAS.label) {
+                val subCategories =
+                    if (category == CategoryEnum.HAUT.label) subCategoriesHaut else subCategoriesBas
+                item {
+                    ExposedDropdownMenuBoxSample(
+                        label = "Sous-catégorie",
+                        options = subCategories,
+                        value = subCategory ?: "",
+                        onValueChange = { subCategory = it }
+                    )
+                }
+            }
+
+            item {
+                ExposedDropdownMenuBoxSample(
+                    label = "Couleur",
+                    options = ColorEnum.entries.map { it.label },
+                    value = color,
+                    onValueChange = { color = it }
+                )
+            }
+
+            item {
+                ExposedDropdownMenuBoxSample(
+                    label = "Motif",
+                    options = MotifEnum.entries.map { it.label },
+                    value = motif,
+                    onValueChange = { motif = it }
+                )
+            }
+
+            item {
+                MultiSelectDropdownMenu(
+                    label = "Saison",
+                    options = SaisonEnum.entries.map { it.label },
+                    selectedItems = selectedSeasons,
+                    onSelectionChange = { selectedSeasons = it }
+                )
+            }
+
+            item {
+                Button(
+                    enabled = selectedImage != null && category.isNotBlank() && color.isNotBlank(),
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        val image = selectedImage ?: return@Button
+
+                        viewModel.saveClothes(
+                            context = context,
+                            sourceUri = image,
+                            category = category,
+                            subCategory = subCategory,
+                            color = color,
+                            seasons = selectedSeasons,
+                            motif = motif,
+                            nom = nom
+                        ) {
+                            // reset UI
+                            selectedImage = null
+                            category = ""
+                            nom = ""
+                            color = ""
+                            motif = "Aucun"
+                            subCategory = null
+                            selectedSeasons = emptyList()
+                        }
+                        onBack()
+                    }
+                ) {
+                    Text("Enregistrer")
+                }
             }
         }
     }
