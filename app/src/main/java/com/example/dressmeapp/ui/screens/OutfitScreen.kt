@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.SaveAs
 
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
@@ -26,6 +27,7 @@ import com.example.dressmeapp.enums.SaisonEnum
 import com.example.dressmeapp.enums.SubCategoryEnum
 import com.example.dressmeapp.ui.components.PageTitle
 import com.example.dressmeapp.viewmodel.ClothesViewModel
+import com.example.dressmeapp.viewmodel.OutfitViewModel
 import com.example.dressmeapp.viewmodel.RulesViewModel
 import com.google.accompanist.flowlayout.FlowRow
 import java.time.LocalDate
@@ -35,7 +37,8 @@ import java.time.LocalDate
 fun OutfitScreen(
     padding: PaddingValues,
     viewModel: ClothesViewModel,
-    rulesViewModel: RulesViewModel
+    rulesViewModel: RulesViewModel,
+    outfitViewModel: OutfitViewModel
 ) {
 
     // ----- ViewModel states -----
@@ -47,7 +50,7 @@ fun OutfitScreen(
     var generatGiletWithTeeShirt by rememberSaveable { mutableStateOf(true) }
     var selectedSeason by rememberSaveable { mutableStateOf(currentSeasonLabel()) }
     var showSettings by rememberSaveable { mutableStateOf(false) }
-
+    var showSaveSheet by rememberSaveable { mutableStateOf(false) }
     // ----- Auto generate outfit -----
     LaunchedEffect(allRules, selectedSeason, generatGlobalOutfit, generatGiletWithTeeShirt) {
         if (allRules.isNotEmpty()) {
@@ -85,7 +88,11 @@ fun OutfitScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    PageTitle("Tenue aléatoire", modifier = Modifier.weight(1f), fillMaxWidth = false)
+                    PageTitle(
+                        "Tenue aléatoire",
+                        modifier = Modifier.weight(1f),
+                        fillMaxWidth = false
+                    )
 
                     IconButton(onClick = { showSettings = true }) {
                         Icon(
@@ -93,7 +100,7 @@ fun OutfitScreen(
                             contentDescription = "Paramètres",
                             modifier = Modifier.size(24.dp),
 
-                        )
+                            )
                     }
 
                 }
@@ -135,22 +142,38 @@ fun OutfitScreen(
             }
         }
 
-        // ----- Force regenerate -----
-        Button(
-            onClick = {
-                viewModel.generateOutfit(
-                    generatGlobalOutfit,
-                    generatGiletWithTeeShirt,
-                    allRules,
-                    selectedSeason
-                )
-            }
+
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Générer une autre tenue")
+            // ----- Force regenerate -----
+            Button(
+                onClick = {
+                    viewModel.generateOutfit(
+                        generatGlobalOutfit,
+                        generatGiletWithTeeShirt,
+                        allRules,
+                        selectedSeason
+                    )
+                }
+            ) {
+                Text("Générer une autre tenue")
+            }
+
+            Button(
+                onClick = { showSaveSheet = true }
+            ) {
+                Icon(Icons.Default.SaveAs, contentDescription = "Enregistrer la tenue")
+            }
         }
 
         Spacer(Modifier.height(2.dp))
     }
+
+
+
 
     // ===== MODAL BOTTOM SHEET =====
 
@@ -170,6 +193,35 @@ fun OutfitScreen(
             )
         }
     }
+
+
+
+    if (showSaveSheet) {
+        SaveOutfitSheet(
+            onDismiss = { showSaveSheet = false },
+            onSave = { label, seasons ->
+
+                val clothesIds = listOfNotNull(
+                    outfit?.global?.id,
+                    outfit?.bas?.id,
+                    outfit?.haut?.id,
+                    outfit?.chaussures?.id,
+                    outfit?.manteau?.id,
+                    outfit?.teeShirt?.id
+                )
+
+                outfitViewModel.saveOutfit(
+                    name = label,
+                    seasons = seasons,
+                    clothesIds = clothesIds
+                )
+
+                showSaveSheet = false
+            }
+        )
+    }
+
+
 }
 
 @Composable
@@ -289,6 +341,66 @@ fun SettingsContent(
         }
 
         Spacer(Modifier.height(12.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SaveOutfitSheet(
+    onDismiss: () -> Unit,
+    onSave: (String, List<String>) -> Unit
+) {
+    var label by remember { mutableStateOf("") }
+
+    val allSeasons = SaisonEnum.entries.map { it.label }
+    val selectedSeasons = remember { mutableStateListOf<String>() }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text("Enregistrer la tenue", style = MaterialTheme.typography.headlineSmall)
+
+            // Champ label
+            OutlinedTextField(
+                value = label,
+                onValueChange = { label = it },
+                label = { Text("Nom de la tenue") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Sélection des saisons
+            Text("Saisons", style = MaterialTheme.typography.titleMedium)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                allSeasons.forEach { season ->
+                    FilterChip(
+                        selected = selectedSeasons.contains(season),
+                        onClick = {
+                            if (selectedSeasons.contains(season))
+                                selectedSeasons.remove(season)
+                            else
+                                selectedSeasons.add(season)
+                        },
+                        label = { Text(season) }
+                    )
+                }
+            }
+
+            // Bouton enregistrer
+            Button(
+                onClick = { onSave(label, selectedSeasons.toList()) },
+                enabled = label.isNotBlank() && selectedSeasons.isNotEmpty(),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Enregistrer")
+            }
+        }
     }
 }
 
