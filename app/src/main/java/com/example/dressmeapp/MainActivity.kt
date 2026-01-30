@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+      //  WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             DressMeTheme {
                 var selectedTab by remember { mutableStateOf(0) }
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                 var isAddingOutfit by remember { mutableStateOf(false) }
                 var isAddingClothe by remember { mutableStateOf(false) }
 
-                WindowCompat.setDecorFitsSystemWindows(window, false)
+            //    WindowCompat.setDecorFitsSystemWindows(window, false)
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     Scaffold(
@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
                             NavigationBar(
                                 containerColor = colors.surface,       // fond de la barre
                                 contentColor = colors.onSurface,       // couleur par défaut du contenu
-                                tonalElevation = 3.dp
+                                tonalElevation = 3.dp,
                             ) {
                                 NavigationBarItem(
                                     selected = selectedTab == 0,
@@ -144,64 +144,70 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     ) { padding ->
-                        when (selectedTab) {
-                            0 -> {
-                                if (isAddingClothe) {
-                                    AddClothesScreen(padding = padding, viewModel = clothesVM, onBack = { isAddingClothe = false })
-                                } else {
-                                    AllClothesScreen(padding = padding, viewModel = clothesVM, onAddClotheClick = { isAddingClothe = true })
+                            when (selectedTab) {
+                                0 -> {
+                                    if (isAddingClothe) {
+                                        AddClothesScreen(
+                                            padding = padding,
+                                            viewModel = clothesVM,
+                                            onBack = { isAddingClothe = false })
+                                    } else {
+                                        AllClothesScreen(
+                                            padding = padding,
+                                            viewModel = clothesVM,
+                                            onAddClotheClick = { isAddingClothe = true })
+                                    }
                                 }
-                            }
-                            1 -> OutfitScreen(
-                                padding = padding,
-                                viewModel = clothesVM,
-                                rulesViewModel = rulesVM,
-                                outfitViewModel = outfitVM
-                            )
 
-                            2 -> {
-                                if (isAddingRule) {
-                                    RulesScreen(
-                                        padding = padding,
-                                        viewModel = rulesVM,
-                                        clothesViewModel = clothesVM,
-                                        onBack = { isAddingRule = false }
-                                    )
-                                } else {
-                                    AllRulesScreen(
-                                        padding = padding,
-                                        viewModel = rulesVM,
-                                        clothesViewModel = clothesVM,
-                                        onAddRuleClick = { isAddingRule = true }
-                                    )
+                                1 -> OutfitScreen(
+                                    padding = padding,
+                                    viewModel = clothesVM,
+                                    rulesViewModel = rulesVM,
+                                    outfitViewModel = outfitVM
+                                )
+
+                                2 -> {
+                                    if (isAddingRule) {
+                                        RulesScreen(
+                                            padding = padding,
+                                            viewModel = rulesVM,
+                                            clothesViewModel = clothesVM,
+                                            onBack = { isAddingRule = false }
+                                        )
+                                    } else {
+                                        AllRulesScreen(
+                                            padding = padding,
+                                            viewModel = rulesVM,
+                                            clothesViewModel = clothesVM,
+                                            onAddRuleClick = { isAddingRule = true }
+                                        )
+                                    }
                                 }
-                            }
 
-                            3 -> {
-                                if (isAddingOutfit) {
-                                    AddOutfitScreen (
-                                        padding = padding,
-                                        outfitsVM = outfitVM,
-                                        clothesViewModel = clothesVM,
-                                        onBack = { isAddingOutfit = false }
-                                    )
-                                } else {
-                                    TenuesScreen(
-                                        padding = padding,
-                                        clothesViewModel = clothesVM,
-                                        outfitsVM = outfitVM,
-                                        onAddOutfitClick = { isAddingOutfit = true })
+                                3 -> {
+                                    if (isAddingOutfit) {
+                                        AddOutfitScreen(
+                                            padding = padding,
+                                            outfitsVM = outfitVM,
+                                            clothesViewModel = clothesVM,
+                                            onBack = { isAddingOutfit = false }
+                                        )
+                                    } else {
+                                        TenuesScreen(
+                                            padding = padding,
+                                            clothesViewModel = clothesVM,
+                                            outfitsVM = outfitVM,
+                                            onAddOutfitClick = { isAddingOutfit = true })
+                                    }
                                 }
                             }
                         }
-
                     }
-                }
+
             }
         }
     }
 }
-
 
 
 

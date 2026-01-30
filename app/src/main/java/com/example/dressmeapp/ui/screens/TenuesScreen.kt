@@ -6,12 +6,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import coil.compose.AsyncImage
+import com.example.dressmeapp.enums.SaisonEnum
 import com.example.dressmeapp.model.Clothes
 import com.example.dressmeapp.model.Outfit
 import com.example.dressmeapp.ui.components.AddFab
@@ -20,6 +23,7 @@ import com.example.dressmeapp.ui.components.PageTitle
 import com.example.dressmeapp.ui.theme.Dimensions
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 import com.example.dressmeapp.viewmodel.OutfitViewModel
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,6 +35,17 @@ fun TenuesScreen(
 ) {
     val allOutfit by outfitsVM.allOutfits.observeAsState(emptyList())
     val allClothes by clothesViewModel.allClothes.observeAsState(emptyList())
+
+    // Déterminer la saison actuelle
+    val currentSeason = getCurrentSeason()
+    var selectedSeasons by remember { mutableStateOf(setOf(currentSeason)) }
+    var showSeasonMenu by remember { mutableStateOf(false) }
+    val seasons = SaisonEnum.entries.map { it.label }
+
+    // Filtrer les tenues selon les saisons sélectionnées
+    val filteredOutfits = allOutfit.filter { outfit ->
+        outfit.seasons.any { selectedSeasons.contains(it) }
+    }
 
     Box(
         modifier = Modifier
@@ -46,9 +61,55 @@ fun TenuesScreen(
             contentPadding = PaddingValues(Dimensions.spacing16)
         ) {
             // Titre principal
-            item { PageTitle("Toutes les tenues") }
+            item {
+                Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+                ) {
+                    PageTitle("Toutes les tenues",
+                        modifier = Modifier.weight(1f),
+                        fillMaxWidth = false)
 
-            items(allOutfit) { outfit ->
+                    Box {
+                        IconButton(onClick = { showSeasonMenu = !showSeasonMenu }) {
+                            Icon(
+                                imageVector = androidx.compose.material.icons.Icons.Default.Settings,
+                                contentDescription = "Filtrer par saison",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        // Menu déroulant
+                        DropdownMenu(
+                            expanded = showSeasonMenu,
+                            onDismissRequest = { showSeasonMenu = false },
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(Dimensions.spacing12),
+                                verticalArrangement = Arrangement.spacedBy(Dimensions.spacing8)
+                            ) {
+                                seasons.forEach { season ->
+                                    FilterChip(
+                                        selected = selectedSeasons.contains(season),
+                                        onClick = {
+                                            selectedSeasons = if (selectedSeasons.contains(season)) {
+                                                selectedSeasons - season
+                                            } else {
+                                                selectedSeasons + season
+                                            }
+                                        },
+                                        label = { Text(season) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            items(filteredOutfits) { outfit ->
                 OutfitCardCompact(
                     outfit = outfit,
                     allClothes = allClothes,
@@ -147,5 +208,15 @@ fun OutfitCardCompact(
                 )
             }
         }
+    }
+}
+
+private fun getCurrentSeason(): String {
+    val month = LocalDate.now().monthValue
+    return when (month) {
+        3, 4, 5 -> SaisonEnum.PRINTEMPS.label
+        6, 7, 8 -> SaisonEnum.ETE.label
+        9, 10, 11 -> SaisonEnum.AUTOMNE.label
+        else -> SaisonEnum.HIVER.label
     }
 }

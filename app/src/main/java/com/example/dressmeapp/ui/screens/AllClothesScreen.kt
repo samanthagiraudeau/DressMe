@@ -8,6 +8,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.capitalize
 import com.example.dressmeapp.model.Clothes
 import com.example.dressmeapp.ui.components.AddFab
 import com.example.dressmeapp.ui.components.ClothesCard
@@ -16,6 +17,7 @@ import com.example.dressmeapp.ui.components.PageTitle
 import com.example.dressmeapp.ui.theme.Dimensions
 import com.example.dressmeapp.viewmodel.ClothesViewModel
 import java.io.File
+import kotlin.toString
 
 @Composable
 fun AllClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel, onAddClotheClick: () -> Unit) {
@@ -58,7 +60,7 @@ fun AllClothesScreen(padding: PaddingValues, viewModel: ClothesViewModel, onAddC
 
                 item {
                     ExpandableSection(
-                        title = groupName,
+                        title = groupName.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
                         initiallyExpanded = expanded,
                         modifier = Modifier.padding(horizontal = Dimensions.spacing0)
                     ) {

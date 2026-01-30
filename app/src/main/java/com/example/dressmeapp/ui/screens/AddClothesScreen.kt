@@ -76,7 +76,7 @@ fun AddClothesScreen(
         LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .imePadding()
+                //.imePadding()
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(Dimensions.spacing16),
             horizontalAlignment = Alignment.CenterHorizontally,

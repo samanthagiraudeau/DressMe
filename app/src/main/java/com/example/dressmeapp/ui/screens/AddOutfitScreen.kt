@@ -144,7 +144,7 @@ fun AddOutfitScreen(
                         )
                         onBack()
                     },
-                    enabled = outfitName.isNotBlank(),
+                    enabled = outfitName.isNotBlank() && selectedSeasons.isNotEmpty() && selectedIds.isNotEmpty(),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
