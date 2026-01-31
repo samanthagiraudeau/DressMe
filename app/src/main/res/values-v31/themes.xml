@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.DressMeApp" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Couleur de fond du Splash (gris foncé) -->
+        <item name="android:windowSplashScreenBackground">#2C2C2C</item>
+
+        <!-- Optionnel: icône animée (on ne met rien ici pour un fond uni) -->
+        <!-- Si tu veux éviter qu'Android affiche une icône par défaut, tu peux mettre un petit drawable transparent -->
+        <!-- <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_splash_placeholder</item> -->
+
+        <!-- Couleurs de l’app ensuite -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>

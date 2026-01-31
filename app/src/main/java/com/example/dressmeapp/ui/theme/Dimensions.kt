@@ -11,6 +11,7 @@ object Dimensions {
     val spacing0 = 0.dp
     val spacing1 = 1.dp
     val spacing2 = 2.dp
+    val spacing3 = 3.dp
     val spacing4 = 4.dp
     val spacing8 = 8.dp
     val spacing12 = 12.dp
